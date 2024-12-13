@@ -22,6 +22,23 @@ Supports bold and italic text using the `**` and `*` syntax:
 
 Automatically wraps text in `<p>` tags when no other tags are present.
 
+### Additional Text Formatting
+
+#### Subscript
+Use single tildes: `H~2~O` becomes H<sub>2</sub>O
+
+#### Superscript
+Use carets: `2^nd^` becomes 2<sup>nd</sup>
+
+#### Small Text
+Use double percent signs: `%%smaller text%%`
+
+#### Marked/Highlighted Text
+Use double equals signs: `==highlighted text==`
+
+#### Abbreviations
+Use [@text@title] syntax: `[@WHO@World Health Organization]`
+
 ## Usage
 
 ```bash
@@ -73,7 +90,7 @@ cargo run test.md
 - [ ] Add support for horizontal rules
 - [ ] Add support for line breaks
 - [x] Add support for strikethrough text
-- [ ] Add support for subscript and superscript text
+- [x] Add support for subscript and superscript text
 - [ ] Add support for small text
 - [ ] Add support for mark text
 - [ ] Add support for abbreviations
