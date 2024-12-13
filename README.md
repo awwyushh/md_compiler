@@ -94,7 +94,6 @@ cargo run test.md
 - [ ] Add support for small text
 - [ ] Add support for mark text
 - [ ] Add support for abbreviations
-- [ ] Add support for ruby annotations
 - [ ] Add support for subscript and superscript text
 - [ ] Add support for small text
 - [ ] Add support for mark text
