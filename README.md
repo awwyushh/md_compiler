@@ -65,14 +65,14 @@ cargo run test.md
 
 - [ ] Add support for ordered lists
 - [ ] Add support for unordered lists
-- [ ] Add support for links
+- [*] Add support for links
 - [ ] Add support for images
 - [ ] Add support for tables
 - [ ] Add support for code blocks
-- [ ] Add support for blockquotes
+- [*] Add support for blockquotes
 - [ ] Add support for horizontal rules
 - [ ] Add support for line breaks
-- [ ] Add support for strikethrough text
+- [*] Add support for strikethrough text
 - [ ] Add support for subscript and superscript text
 - [ ] Add support for small text
 - [ ] Add support for mark text

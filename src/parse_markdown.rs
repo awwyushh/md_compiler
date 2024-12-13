@@ -20,12 +20,20 @@ pub fn parse_markdown_file(file_path: &str) {
         let line_contents = line.unwrap();
         let mut output_line = String::new();
 
-        let heading_level = line_contents.chars()
+        // Check for blockquote first
+        let is_blockquote = line_contents.starts_with('>');
+        let content = if is_blockquote {
+            line_contents[1..].trim().to_string()
+        } else {
+            line_contents
+        };
+
+        let heading_level = content.chars()
             .take_while(|&c| c == '#')
             .count();
 
-        // Process the line content for both bold and italic text
-        let processed_content = process_text_styles(&line_contents);
+        // Process the line content for styles and links
+        let processed_content = process_text_styles(&content);
 
         match heading_level {
             1..=3 => {
@@ -48,7 +56,11 @@ pub fn parse_markdown_file(file_path: &str) {
             0 | _ => {
                 if !ptag {
                     ptag = true;
-                    output_line.push_str("<p>");
+                    if is_blockquote {
+                        output_line.push_str("<blockquote><p>");
+                    } else {
+                        output_line.push_str("<p>");
+                    }
                 } 
                 output_line.push_str(&processed_content);
             }
@@ -56,7 +68,11 @@ pub fn parse_markdown_file(file_path: &str) {
 
         if ptag {
             ptag = false;
-            output_line.push_str("</p>\n");
+            if is_blockquote {
+                output_line.push_str("</p></blockquote>\n");
+            } else {
+                output_line.push_str("</p>\n");
+            }
         }
 
         if output_line != "<p></p>\n" {
@@ -77,50 +93,84 @@ fn process_text_styles(text: &str) -> String {
     let mut chars = text.chars().peekable();
     let mut in_bold = false;
     let mut in_italic = false;
+    let mut in_strike = false;
+    let mut link_text = String::new();
+    let mut collecting_link_text = false;
+    let mut link_url = String::new();
+    let mut collecting_link_url = false;
 
     while let Some(current) = chars.next() {
         match current {
-            '*' => {
-                if chars.peek() == Some(&'*') {
-                    chars.next(); // consume second *
-                    if !in_bold {
-                        result.push_str("<strong>");
-                        in_bold = true;
-                    } else {
-                        result.push_str("</strong>");
-                        in_bold = false;
-                    }
+            '[' => {
+                collecting_link_text = true;
+                continue;
+            },
+            ']' => {
+                if chars.peek() == Some(&'(') {
+                    collecting_link_text = false;
+                    chars.next(); // consume '('
+                    collecting_link_url = true;
+                    continue;
                 } else {
-                    if !in_italic {
-                        result.push_str("<em>");
-                        in_italic = true;
-                    } else {
-                        result.push_str("</em>");
-                        in_italic = false;
-                    }
+                    result.push('[');
+                    result.push_str(&link_text);
+                    result.push(']');
+                    link_text.clear();
                 }
             },
-            '_' => {
-                if chars.peek() == Some(&'_') {
-                    chars.next(); // consume second _
-                    if !in_bold {
-                        result.push_str("<strong>");
-                        in_bold = true;
+            ')' if collecting_link_url => {
+                collecting_link_url = false;
+                result.push_str(&format!("<a href=\"{}\">{}</a>", link_url, link_text));
+                link_text.clear();
+                link_url.clear();
+                continue;
+            },
+            '~' => {
+                if chars.peek() == Some(&'~') {
+                    chars.next(); // consume second ~
+                    if !in_strike {
+                        result.push_str("<del>");
+                        in_strike = true;
                     } else {
-                        result.push_str("</strong>");
-                        in_bold = false;
+                        result.push_str("</del>");
+                        in_strike = false;
                     }
-                } else {
-                    if !in_italic {
-                        result.push_str("<em>");
-                        in_italic = true;
-                    } else {
-                        result.push_str("</em>");
-                        in_italic = false;
-                    }
+                    continue;
                 }
             },
-            _ => result.push(current),
+            '*' | '_' => {
+                if collecting_link_text {
+                    link_text.push(current);
+                    continue;
+                }
+                if collecting_link_url {
+                    link_url.push(current);
+                    continue;
+                }
+                if !in_bold {
+                    result.push_str("<strong>");
+                    in_bold = true;
+                } else {
+                    result.push_str("</strong>");
+                    in_bold = false;
+                }
+                if !in_italic {
+                    result.push_str("<em>");
+                    in_italic = true;
+                } else {
+                    result.push_str("</em>");
+                    in_italic = false;
+                }
+            },
+            _ => {
+                if collecting_link_text {
+                    link_text.push(current);
+                } else if collecting_link_url {
+                    link_url.push(current);
+                } else {
+                    result.push(current);
+                }
+            }
         }
     }
 
@@ -130,6 +180,9 @@ fn process_text_styles(text: &str) -> String {
     }
     if in_italic {
         result.push_str("</em>");
+    }
+    if in_strike {
+        result.push_str("</del>");
     }
 
     result

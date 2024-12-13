@@ -15,3 +15,7 @@ Jesse likes to eat **burgers**. Alone or with friends. But in the end, he likes 
 ### Jesse's favorite hobbies
 
 Jesse likes to write about computer programming and game design, and when he is not hunched over a computer, you can find him out on a run and listening to a podcast or the serenity of mother nature. 
+
+> Here's a **bold** quote with a [link](https://example.com) and ~~struck~~ text
+
+> Here's a **bold** quote with a [link](https://example.com) and ~~struck~~ text
