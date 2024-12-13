@@ -38,7 +38,9 @@ See the `test.md` file for an example of the compiler in action.
 
 1. Clone the repository
 
+```bash
 git clone https://github.com/awwyushh/md_compiler
+```
 
 2. Build your project
 
